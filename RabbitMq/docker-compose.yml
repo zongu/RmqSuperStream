@@ -1,0 +1,74 @@
+name: rmq
+
+services:
+  rmq-1:
+    image: rabbitmq:4-management
+    container_name: rmq-1
+    hostname: rmq-1
+    restart: always
+    ports:
+      - "1001:5672"
+      - "1002:15672"
+      - "1003:5552"
+    environment:
+      RABBITMQ_ERLANG_COOKIE: rabbitcookie
+      RABBITMQ_NODENAME: rabbit@rmq-1
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+    volumes:
+      - /etc/rmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+      - /etc/rmq/enabled_plugins:/etc/rabbitmq/enabled_plugins:ro
+
+  rmq-2:
+    image: rabbitmq:4-management
+    container_name: rmq-2
+    hostname: rmq-2
+    restart: always
+    ports:
+      - "1004:5672"
+      - "1005:15672"
+      - "1006:5552"
+    environment:
+      RABBITMQ_ERLANG_COOKIE: rabbitcookie
+      RABBITMQ_NODENAME: rabbit@rmq-2
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+    depends_on:
+      rmq-1:
+        condition: service_healthy
+    volumes:
+      - /etc/rmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+      - /etc/rmq/enabled_plugins:/etc/rabbitmq/enabled_plugins:ro
+
+  rmq-3:
+    image: rabbitmq:4-management
+    container_name: rmq-3
+    hostname: rmq-3
+    restart: always
+    ports:
+      - "1007:5672"
+      - "1008:15672"
+      - "1009:5552"
+    environment:
+      RABBITMQ_ERLANG_COOKIE: rabbitcookie
+      RABBITMQ_NODENAME: rabbit@rmq-3
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+    depends_on:
+      rmq-1:
+        condition: service_healthy
+    volumes:
+      - /etc/rmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+      - /etc/rmq/enabled_plugins:/etc/rabbitmq/enabled_plugins:ro
